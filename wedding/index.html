@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amy & Jeremiah · CineVia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --cream: #F5F0E8;
+    --dark: #0A0A0A;
+    --dark3: #1A1A1A;
+    --text: #E8E0D0;
+    --text-dim: rgba(232,224,208,0.5);
+  }
+  body { font-family: 'Montserrat', sans-serif; background: var(--dark); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  #gate { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.8s ease; }
+  #gate.hidden { opacity: 0; pointer-events: none; }
+  .gate-inner { text-align: center; padding: 3rem; max-width: 420px; width: 90%; }
+  .gate-logo { font-family: 'Cormorant Garamond', serif; font-size: 28px; letter-spacing: 6px; color: var(--gold); margin-bottom: 0.25rem; }
+  .gate-logo-sub { font-size: 9px; letter-spacing: 5px; color: rgba(201,168,76,0.5); text-transform: uppercase; margin-bottom: 2.5rem; }
+  .gate-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 6vw, 3rem); font-weight: 300; line-height: 1.2; color: var(--cream); margin-bottom: 0.5rem; }
+  .gate-title em { font-style: italic; color: var(--gold); }
+  .gate-subtitle { font-size: 10px; letter-spacing: 4px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 2.5rem; }
+  .gate-divider { width: 60px; height: 1px; background: var(--gold); margin: 0 auto 2.5rem; opacity: 0.5; }
+  .gate-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 0.75rem; }
+  .gate-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.3); color: var(--cream); font-family: 'Montserrat', sans-serif; font-size: 14px; letter-spacing: 4px; padding: 14px 20px; text-align: center; outline: none; margin-bottom: 1rem; transition: border-color 0.3s; }
+  .gate-input:focus { border-color: var(--gold); }
+  .gate-input::placeholder { color: rgba(255,255,255,0.2); letter-spacing: 2px; }
+  .gate-btn { width: 100%; background: transparent; border: 1px solid var(--gold); color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; padding: 14px 20px; cursor: pointer; transition: all 0.3s; }
+  .gate-btn:hover { background: var(--gold); color: var(--dark); }
+  .gate-error { font-size: 10px; color: #c0392b; letter-spacing: 2px; margin-top: 0.75rem; min-height: 16px; }
+  .gate-footer { margin-top: 3rem; font-size: 9px; letter-spacing: 2px; color: rgba(201,168,76,0.3); text-transform: uppercase; }
+
+  #gallery { display: none; }
+  #gallery.visible { display: block; }
+
+  .hero { position: relative; height: 85vh; min-height: 500px; display: flex; align-items: flex-end; padding: 3rem 4rem; overflow: hidden; background: linear-gradient(135deg, #0a0d1a 0%, #0d1a0a 40%, #0a0a0a 100%); }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse at 60% 20%, rgba(201,168,76,0.07) 0%, transparent 60%), radial-gradient(ellipse at 30% 80%, rgba(100,150,201,0.07) 0%, transparent 50%); }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,10,10,0.1) 0%, rgba(10,10,10,0.88) 100%); z-index: 1; }
+  .hero-content { position: relative; z-index: 2; max-width: 700px; }
+  .hero-tag { display: inline-block; font-size: 9px; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(201,168,76,0.4); padding: 5px 14px; margin-bottom: 1.5rem; }
+  .hero-names { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 6vw, 4.5rem); font-weight: 300; line-height: 1.05; color: var(--cream); margin-bottom: 0.4rem; }
+  .hero-names em { font-style: italic; color: var(--gold-light); }
+  .hero-ampersand { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.5rem, 4vw, 3rem); font-style: italic; color: var(--gold); opacity: 0.7; display: block; margin: -0.2rem 0; }
+  .hero-date { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 2rem; margin-top: 0.5rem; }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .hero-play { display: inline-flex; align-items: center; gap: 12px; background: var(--gold); color: var(--dark); border: none; font-family: 'Montserrat', sans-serif; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; padding: 14px 28px; cursor: pointer; transition: all 0.3s; }
+  .hero-play:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .hero-play svg { width: 14px; height: 14px; }
+  .hero-meta { position: absolute; top: 2rem; right: 3rem; z-index: 2; text-align: right; }
+  .delivered-by { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+  .cv-badge { font-family: 'Cormorant Garamond', serif; font-size: 22px; letter-spacing: 3px; color: var(--gold); }
+  .cv-badge-sub { font-size: 8px; letter-spacing: 3px; color: rgba(201,168,76,0.4); text-transform: uppercase; }
+
+  .section { padding: 3rem 4rem; max-width: 1200px; margin: 0 auto; }
+  .section-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
+  .section-label { font-size: 9px; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+  .section-line { flex: 1; height: 1px; background: rgba(201,168,76,0.15); }
+
+  .featured-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+  .chapter-card { position: relative; cursor: pointer; overflow: hidden; background: var(--dark3); border: 1px solid rgba(201,168,76,0.1); transition: all 0.4s; aspect-ratio: 16/9; }
+  .chapter-card:hover { border-color: rgba(201,168,76,0.4); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .chapter-card.wide { grid-column: 1 / -1; aspect-ratio: 21/9; }
+  .card-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: transform 0.6s; }
+  .chapter-card:hover .card-thumb-placeholder { transform: scale(1.05); }
+  .tp-gold { background: linear-gradient(135deg, #2a1f0a 0%, #3d2b0f 50%, #1a1000 100%); }
+  .tp-silver { background: linear-gradient(135deg, #1a1a2a 0%, #2a2a3d 50%, #0a0a1a 100%); }
+  .tp-deep { background: linear-gradient(135deg, #0a1a2a 0%, #0f2b3d 50%, #001a2a 100%); }
+  .tp-emerald { background: linear-gradient(135deg, #0a2a1a 0%, #0f3d2b 50%, #001a10 100%); }
+  .tp-warm { background: linear-gradient(135deg, #2a1a0a 0%, #3d2b1a 50%, #1a0a00 100%); }
+  .placeholder-icon { font-size: 3rem; opacity: 0.3; }
+  .card-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.85) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 1.5rem; }
+  .card-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); width: 52px; height: 52px; border-radius: 50%; background: rgba(201,168,76,0.9); display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.3s; }
+  .chapter-card:hover .card-play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .card-play-btn svg { width: 18px; height: 18px; fill: var(--dark); margin-left: 3px; }
+  .card-chapter-num { font-size: 9px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 0.4rem; }
+  .card-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.2rem, 2.5vw, 1.8rem); font-weight: 400; color: var(--cream); line-height: 1.1; }
+  .card-duration { font-size: 9px; letter-spacing: 2px; color: var(--text-dim); margin-top: 0.3rem; }
+
+  .side-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .side-card { position: relative; cursor: pointer; overflow: hidden; background: var(--dark3); border: 1px solid rgba(201,168,76,0.08); transition: all 0.3s; aspect-ratio: 4/3; }
+  .side-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-3px); }
+  .side-card .card-overlay { padding: 1rem; }
+  .side-card .card-title { font-size: 1rem; }
+  .side-card .card-play-btn { width: 38px; height: 38px; }
+  .side-card .card-play-btn svg { width: 14px; height: 14px; }
+
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 2000; align-items: center; justify-content: center; padding: 2rem; }
+  .modal.open { display: flex; }
+  .modal-inner { position: relative; width: 100%; max-width: 960px; animation: modalIn 0.4s ease; }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(201,168,76,0.2); }
+  .modal-chapter { font-size: 9px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
+  .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; color: var(--cream); }
+  .modal-close { background: none; border: 1px solid rgba(232,224,208,0.2); color: var(--text-dim); cursor: pointer; font-size: 1rem; padding: 8px 12px; transition: all 0.2s; }
+  .modal-close:hover { color: var(--gold); border-color: var(--gold); }
+  .modal-video { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
+  .modal-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+  .modal-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; }
+  .modal-placeholder-icon { font-size: 4rem; opacity: 0.3; }
+  .modal-placeholder-text { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; color: var(--text-dim); }
+  .modal-placeholder-sub { font-size: 9px; letter-spacing: 3px; color: rgba(201,168,76,0.4); text-transform: uppercase; }
+
+  .gallery-footer { border-top: 1px solid rgba(201,168,76,0.1); padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center; }
+  .footer-brand { font-family: 'Cormorant Garamond', serif; font-size: 14px; letter-spacing: 2px; color: var(--text-dim); }
+  .footer-cv { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgba(201,168,76,0.4); }
+
+  @media (max-width: 768px) {
+    .hero { padding: 1.5rem; min-height: 60vh; }
+    .hero-meta { top: 1rem; right: 1.5rem; }
+    .section { padding: 2rem 1.5rem; }
+    .featured-grid { grid-template-columns: 1fr; }
+    .chapter-card.wide { grid-column: 1; aspect-ratio: 16/9; }
+    .side-grid { grid-template-columns: repeat(2, 1fr); }
+    .gallery-footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem 1.5rem; }
+    .hero-actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-inner">
+    <div class="gate-logo">CineVia</div>
+    <div class="gate-logo-sub">Private Film Delivery</div>
+    <h1 class="gate-title"><em>Amy & Jeremiah</em></h1>
+    <div class="gate-subtitle">Sandlewood Manor · February 28, 2026</div>
+    <div class="gate-divider"></div>
+    <div class="gate-label">Enter your private access code</div>
+    <input class="gate-input" id="pwInput" type="password" placeholder="· · · · · · · ·" maxlength="20" />
+    <button class="gate-btn" onclick="checkPass()">View Your Film</button>
+    <div class="gate-error" id="gateError"></div>
+    <div class="gate-footer">Delivered by Dreamlite Productions · dreamliteproductions.com</div>
+  </div>
+</div>
+
+<div id="gallery">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-meta">
+      <div class="delivered-by">Delivered by</div>
+      <div class="cv-badge">CineVia</div>
+      <div class="cv-badge-sub">cinevia.co</div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-tag">Wedding Film · Sandlewood Manor · Tomball, TX</div>
+      <h1 class="hero-names">
+        <em>Amy</em>
+        <span class="hero-ampersand">&</span>
+        Jeremiah
+      </h1>
+      <div class="hero-date">February 28, 2026 · Filmed by Dreamlite Productions</div>
+      <div class="hero-actions">
+        <button class="hero-play" onclick="openModal('Dreamlite Signature', 'Same Day Edit — Wedding Premiere', 'https://www.youtube.com/embed/OvyqBBDC_lk?autoplay=1&rel=0')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Play Same Day Edit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <span class="section-label">Featured Chapters</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="featured-grid">
+      <div class="chapter-card wide" onclick="openModal('Dreamlite Signature', 'Same Day Edit — Wedding Premiere', 'https://www.youtube.com/embed/OvyqBBDC_lk?autoplay=1&rel=0')">
+        <div class="card-thumb-placeholder tp-gold" style="height:100%"><span class="placeholder-icon">✨</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay">
+          <div class="card-chapter-num">Dreamlite Signature</div>
+          <div class="card-title">Same Day Edit — Premiered at Reception</div>
+          <div class="card-duration">Cinematic Highlight · Edited & Played Same Night</div>
+        </div>
+      </div>
+      <div class="chapter-card" onclick="openModal('Chapter 02', 'The Ceremony', null)">
+        <div class="card-thumb-placeholder tp-silver" style="height:100%"><span class="placeholder-icon">💍</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay">
+          <div class="card-chapter-num">Chapter 02</div>
+          <div class="card-title">The Ceremony</div>
+          <div class="card-duration">Full Ceremony Film</div>
+        </div>
+      </div>
+      <div class="chapter-card" onclick="openModal('Chapter 03', 'First Dance', null)">
+        <div class="card-thumb-placeholder tp-warm" style="height:100%"><span class="placeholder-icon">💃</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay">
+          <div class="card-chapter-num">Chapter 03</div>
+          <div class="card-title">First Dance</div>
+          <div class="card-duration">Their First Moments as One</div>
+        </div>
+      </div>
+      <div class="chapter-card" onclick="openModal('Chapter 04', 'Vows', null)">
+        <div class="card-thumb-placeholder tp-deep" style="height:100%"><span class="placeholder-icon">🤍</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay">
+          <div class="card-chapter-num">Chapter 04</div>
+          <div class="card-title">The Vows</div>
+          <div class="card-duration">Words That Will Last Forever</div>
+        </div>
+      </div>
+      <div class="chapter-card" onclick="openModal('Chapter 01', 'Full Highlight Film', 'https://www.youtube.com/embed/OvyqBBDC_lk?autoplay=1&rel=0')">
+        <div class="card-thumb-placeholder tp-emerald" style="height:100%"><span class="placeholder-icon">🎬</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay">
+          <div class="card-chapter-num">Chapter 01</div>
+          <div class="card-title">Full Highlight Film</div>
+          <div class="card-duration">Complete Cinematic Edit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:0;">
+    <div class="section-header">
+      <span class="section-label">More From The Day</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="side-grid">
+      <div class="side-card" onclick="openModal('Getting Ready', 'Getting Ready', null)">
+        <div class="card-thumb-placeholder tp-silver" style="height:100%"><span class="placeholder-icon" style="font-size:1.8rem">👗</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay"><div class="card-chapter-num">Getting Ready</div><div class="card-title">Bride & Groom Prep</div></div>
+      </div>
+      <div class="side-card" onclick="openModal('Cocktail Hour', 'Cocktail Hour', null)">
+        <div class="card-thumb-placeholder tp-warm" style="height:100%"><span class="placeholder-icon" style="font-size:1.8rem">🥂</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay"><div class="card-chapter-num">Cocktail Hour</div><div class="card-title">Cocktail Hour</div></div>
+      </div>
+      <div class="side-card" onclick="openModal('Speeches', 'Toasts & Speeches', null)">
+        <div class="card-thumb-placeholder tp-deep" style="height:100%"><span class="placeholder-icon" style="font-size:1.8rem">🎤</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay"><div class="card-chapter-num">Speeches</div><div class="card-title">Toasts & Speeches</div></div>
+      </div>
+      <div class="side-card" onclick="openModal('Reception', 'Full Reception', null)">
+        <div class="card-thumb-placeholder tp-gold" style="height:100%"><span class="placeholder-icon" style="font-size:1.8rem">🎊</span></div>
+        <div class="card-play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="card-overlay"><div class="card-chapter-num">Full Reception</div><div class="card-title">Reception & Celebration</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-footer">
+    <div class="footer-brand">Dreamlite Productions · dreamliteproductions.com</div>
+    <div class="footer-cv">Delivered by CineVia · cinevia.co</div>
+  </div>
+</div>
+
+<div class="modal" id="videoModal" onclick="closeModalOutside(event)">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <div>
+        <div class="modal-chapter" id="modalChapter">Chapter</div>
+        <div class="modal-title" id="modalTitle">Title</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+    </div>
+    <div class="modal-video" id="modalVideoContainer"></div>
+  </div>
+</div>
+
+<script>
+  function checkPass() {
+    const val = document.getElementById('pwInput').value.toLowerCase().trim();
+    if (['amyjeremiah','demo','cinevia','dreamlite','sandlewood','amy'].includes(val)) {
+      document.getElementById('gate').classList.add('hidden');
+      setTimeout(() => {
+        document.getElementById('gate').style.display = 'none';
+        const g = document.getElementById('gallery');
+        g.style.display = 'block';
+        setTimeout(() => g.classList.add('visible'), 10);
+      }, 800);
+    } else {
+      document.getElementById('gateError').textContent = 'Incorrect code — please try again';
+      document.getElementById('pwInput').value = '';
+      document.getElementById('pwInput').focus();
+    }
+  }
+  document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPass(); document.getElementById('gateError').textContent = ''; });
+  function openModal(chapter, title, embedUrl) {
+    document.getElementById('modalChapter').textContent = chapter;
+    document.getElementById('modalTitle').textContent = title;
+    const container = document.getElementById('modalVideoContainer');
+    if (embedUrl) {
+      container.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    } else {
+      container.innerHTML = `<div class="modal-placeholder"><div class="modal-placeholder-icon">🎬</div><div class="modal-placeholder-text">${title}</div><div class="modal-placeholder-sub">Your video will appear here</div></div>`;
+    }
+    document.getElementById('videoModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('videoModal').classList.remove('open');
+    document.getElementById('modalVideoContainer').innerHTML = '';
+    document.body.style.overflow = '';
+  }
+  function closeModalOutside(e) { if (e.target === document.getElementById('videoModal')) closeModal(); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
